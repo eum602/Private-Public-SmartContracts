@@ -26,13 +26,13 @@ contract EventEmitter {
         owner = msg.sender;
     }
 
-    function store(uint _amount) public {
+    function setValue(uint _amount) public {
         emit stored(msg.sender, _amount);
         _value = _amount;
         _sender = msg.sender;
     }
 
-    function value()  view public  returns (uint) {
+    function getValue()  view public  returns (uint) {
         return _value;
     }
 

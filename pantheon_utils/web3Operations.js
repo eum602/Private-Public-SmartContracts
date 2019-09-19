@@ -53,16 +53,21 @@ const getTransaction = async txHash => {
 
 
 const deploySmartContract = async(contractData,addressFrom,privKey) => {
-    const txCount = await web3.eth.getTransactionCount(addressFrom)
-    const txObject = buildSmartContractTransaction(txCount,contractData)
-    const receipt = await sendTransaction(txObject,privKey)
-    //Retriveing contract address and transaction hash
-    //console.log("Transaction hash: ", receipt.transactionHash)
-    console.log("Contract address", receipt.contractAddress)
-    //await create(`block-${receipt.blockNumber}-received-smart-contract-tx`, JSON.stringify(receipt))
-    //console.log(`Contract address saved in path: \
-      // ./.data/block-${receipt.blockNumber}-received-smart-contract-tx.txt`)
-      return receipt.contractAddress
+    try{
+        const txCount = await web3.eth.getTransactionCount(addressFrom)
+        const txObject = buildSmartContractTransaction(txCount,contractData)
+        const receipt = await sendTransaction(txObject,privKey)
+        //Retriveing contract address and transaction hash
+        //console.log("Transaction hash: ", receipt.transactionHash)
+        console.log("Contract address", receipt.contractAddress)
+        //await create(`block-${receipt.blockNumber}-received-smart-contract-tx`, JSON.stringify(receipt))
+        //console.log(`Contract address saved in path: \
+        // ./.data/block-${receipt.blockNumber}-received-smart-contract-tx.txt`)
+        return receipt.contractAddress
+    }catch(e){
+        console.log(e)
+        process.exit()
+    }    
 }
 
 const getValueFromPublicBlockchain = async (EventEmitterAbi,address) => {//address: contract address
@@ -71,7 +76,15 @@ const getValueFromPublicBlockchain = async (EventEmitterAbi,address) => {//addre
       from: '0x1234567890123456789012345678901234567891', // default from address
       gasPrice: '0' // default gas price in wei, 20 gwei in this case
     })
-    const value=await contractInstance.methods.value().call()
+    const value=await contractInstance.methods.getValue().call()
+    console.log('value',value)
+    return value
+}
+
+const getValueFromCaller = async (contractAbi,address,calleeContractAddress) => {//address: contract address
+    const contractInstance = new web3.eth.Contract(contractAbi,address)
+    const value= await contractInstance.methods.getAction(calleeContractAddress).call()
+    .catch(console.log)
     console.log('value',value)
     return value
 }
@@ -101,5 +114,6 @@ module.exports = {
     getData,
     getTransaction,
     deploySmartContract,
-    getValueFromPublicBlockchain
+    getValueFromPublicBlockchain,
+    getValueFromCaller
 }
