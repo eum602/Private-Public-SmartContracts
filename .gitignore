@@ -3,7 +3,6 @@ node_modules
 
 #files
 *lock.json
-deploy.js
 .data
 
 
