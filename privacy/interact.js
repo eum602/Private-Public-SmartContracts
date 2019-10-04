@@ -30,7 +30,7 @@ const storeValueFromNode1 = (privateCallerContractAddress, publicCalleeContractA
     .sendRawTransaction(functionCall)
     .then(transactionHash => {
       console.log("Transaction Hash:", transactionHash);
-      return web3.eea.getTransactionReceipt(
+      return web3.priv.getTransactionReceipt(
         transactionHash,
         orion.node1.publicKey //this can be any other, for instance node 2 or node 3 because it returns the hash
         //from public transaction
@@ -73,7 +73,7 @@ const getValue = (url, privateCallerContractAddress, privateFrom, privateFor, pr
   return web3.eea
     .sendRawTransaction(functionCall)
     .then(transactionHash => {
-      return web3.eea.getTransactionReceipt(
+      return web3.priv.getTransactionReceipt(
         transactionHash,
         orion.node1.publicKey
       )

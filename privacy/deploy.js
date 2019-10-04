@@ -25,8 +25,8 @@ const createPrivateEmitterContract = () => {
 
 const getPrivateContractAddress = transactionHash => {
   console.log("Transaction Hash ", transactionHash);
-  return web3.eea
-    .getTransactionReceipt(transactionHash, orion.node3.publicKey) //node3 is only for obtaining the 
+  return web3.priv
+    .getTransactionReceipt(transactionHash, orion.node1.publicKey) //node3 is only for obtaining the 
     //public transaction receipt, this can be any orion node
     .then(privateTransactionReceipt => {
       console.log("Private Transaction Receipt\n", privateTransactionReceipt);

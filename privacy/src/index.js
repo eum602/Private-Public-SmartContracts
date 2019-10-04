@@ -127,7 +127,7 @@ function EEAClient(web3, chainId) {
       id: 1
     };
 
-    return axios.post(host, payload).then(result => {      
+    return axios.post(host, payload).then(result => {
       return parseInt(result.data.result, 16);
     });
   };
@@ -141,7 +141,13 @@ function EEAClient(web3, chainId) {
     const payload = {
       jsonrpc: "2.0",
       method: "priv_createPrivacyGroup",
-      params: [options.addresses, options.name, options.description],
+      params: [
+        {
+          addresses: options.addresses,
+          name: options.name,
+          description: options.description
+        }
+      ],
       id: 1
     };
 
@@ -195,13 +201,42 @@ function EEAClient(web3, chainId) {
     });
   };
 
+  /**
+   * Get the private transaction Receipt.
+   * @param {string} txHash Transaction Hash of the marker transaction
+   * @param {string} enclavePublicKey Public key used to start-up the Enclave
+   * @param {int} retries Number of retries to be made to get the private marker transaction receipt
+   * @param {int} delay The delay between the retries
+   * @returns {Promise<AxiosResponse<any> | never>}
+   */
+  const getTransactionReceipt = (
+    txHash,
+    enclavePublicKey,
+    retries = 300,
+    delay = 1000
+  ) => {
+    return getMarkerTransaction(txHash, retries, delay)
+      .then(() => {
+        return axios.post(host, {
+          jsonrpc: "2.0",
+          method: "priv_getTransactionReceipt",
+          params: [txHash, enclavePublicKey],
+          id: 1
+        });
+      })
+      .then(result => {
+        return result.data.result;
+      });
+  };
+
   // eslint-disable-next-line no-param-reassign
   web3.priv = {
     generatePrivacyGroup,
     createPrivacyGroup,
     deletePrivacyGroup,
     findPrivacyGroup,
-    getTransactionCount
+    getTransactionCount,
+    getTransactionReceipt
   };
 
   // eslint-disable-next-line no-param-reassign
@@ -226,7 +261,7 @@ function EEAClient(web3, chainId) {
       }
       const tx = new PrivateTransaction();
       const privateKeyBuffer = Buffer.from(options.privateKey, "hex");
-      const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;//convert to PubKey
+      const from = `0x${privateToAddress(privateKeyBuffer).toString("hex")}`;
       return web3.priv
         .getTransactionCount({
           from,
@@ -252,10 +287,9 @@ function EEAClient(web3, chainId) {
             tx.privacyGroupId = options.privacyGroupId;
           }
           tx.restriction = "restricted";
-          tx.sign(privateKeyBuffer);//transaction is signed with the privateKeyBuffer
+          tx.sign(privateKeyBuffer);
 
           const signedRlpEncoded = tx.serialize().toString("hex");
-          //console.log(signedRlpEncoded)
 
           return axios.post(host, {
             jsonrpc: "2.0",
@@ -265,7 +299,6 @@ function EEAClient(web3, chainId) {
           });
         })
         .then(result => {
-          //console.log("....",result)
           return result.data.result;
         })
         .catch(error => {
@@ -274,33 +307,6 @@ function EEAClient(web3, chainId) {
           } else {
             throw error;
           }
-        });
-    },
-    /**
-     * Get the private transaction Receipt.
-     * @param {string} txHash Transaction Hash of the marker transaction
-     * @param {string} enclavePublicKey Public key used to start-up the Enclave
-     * @param {int} retries Number of retries to be made to get the private marker transaction receipt
-     * @param {int} delay The delay between the retries
-     * @returns {Promise<AxiosResponse<any> | never>}
-     */
-    getTransactionReceipt: (
-      txHash,
-      enclavePublicKey,
-      retries = 300,
-      delay = 1000
-    ) => {
-      return getMarkerTransaction(txHash, retries, delay)
-        .then(() => {
-          return axios.post(host, {
-            jsonrpc: "2.0",
-            method: "eea_getTransactionReceipt",
-            params: [txHash, enclavePublicKey],
-            id: 1
-          });
-        })
-        .then(result => {
-          return result.data.result;
         });
     }
   };
