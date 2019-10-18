@@ -60,7 +60,7 @@ const getValue = (url, privateCallerContractAddress, privateFrom, privateFor, pr
 
   const functionArgs = web3.eth.abi
     .encodeParameters(functionAbi.inputs, [publicCalleeContractAddress])
-    .slice(2)  
+    .slice(2)
 
   const functionCall = {
     to: privateCallerContractAddress,
@@ -79,7 +79,7 @@ const getValue = (url, privateCallerContractAddress, privateFrom, privateFor, pr
       )
     })
     .then(result => {
-      console.log(`Get Value from ${url}:`, result.output);
+      console.log(`Getting Value from ${url}:`, result.output.toString(10));
       return result;
     });
 }
@@ -90,7 +90,7 @@ const getValueFromNode1 = (privateCallerContractAddress,publicCalleeContractAddr
     privateCallerContractAddress,
     orion.node1.publicKey,
     [orion.node2.publicKey],
-    pantheon.node3.privateKey,
+    pantheon.node1.privateKey,//"8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",//pantheon.node3.privateKey,
     publicCalleeContractAddress
   );
 };
@@ -117,12 +117,12 @@ const getValueFromNode3 = (privateCallerContractAddress,publicCalleeContractAddr
   );
 };
 
-module.exports = {
-  storeValueFromNode1,
-  getValueFromNode1,
-  getValueFromNode2,
-  getValueFromNode3
-};
+// module.exports = {
+//   storeValueFromNode1,
+//   getValueFromNode1,
+//   getValueFromNode2,
+//   getValueFromNode3
+// };
 
 if (require.main === module) {
   //const address = process.env.CONTRACT_ADDRESS;
@@ -131,11 +131,11 @@ if (require.main === module) {
     .then(() => {
       return getValueFromNode1(contractAddresses.privateCallerContractAddress,contractAddresses.publicCalleeContractAddress);
     })
-    // .then(() => {
-    //   return getValueFromNode2(contractAddresses.privateCallerContractAddress,contractAddresses.publicCalleeContractAddress);
-    // })
+    .then(() => {
+      return getValueFromNode2(contractAddresses.privateCallerContractAddress,contractAddresses.publicCalleeContractAddress);
+    })
     // .then(() => {
     //   return getValueFromNode3(contractAddresses.privateCallerContractAddress,contractAddresses.publicCalleeContractAddress);
     // })
-    //.catch(console.log);
+    .catch(console.log);
 }
