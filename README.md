@@ -2,30 +2,37 @@
 
 ## NOTES
 
+This project allows a private contract to call a public one and query states existing on that contract.
 To run this, you should have a private network over IBFT2.0 consensus algorithm and a private orion transaction manager running for each node
 
 ## How to use
 
 ### Clone Repository ####
+
 ```shell
 $ git clone https://github.com/eum602/Private-Public-SmartContracts.git
 $ cd Private-Public-SmartContracts/
+
 ```
 
 ### Install the needed dependencies ####
 
 ```shell
 $ npm install
+
 ```
 
-### Copying keys  ####
+### Copying keys ####
+
 Fill all needed keys in the file keys.js
 
 ### Deploy the public contract ###
+
 Deploy the public contract by running:
 ```shell
 $ node callee.js
 ```
+
 After that the contract address will be shown on screen. Copy that address into the keys.js files
 
 ```shell
@@ -37,6 +44,7 @@ $ contractAddresses:{
 ```
 
 ### Deploy the private contract address ###
+
 ```shell
 $ node privacy/deploy.js
 ```
@@ -50,6 +58,7 @@ $ contractAddresses:{
 ```
 
 ### Reading public smart contract state from a private smart contract ###
+
 ``` shell
 $ node privacy/interact.js
 ```
