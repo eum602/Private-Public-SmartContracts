@@ -2,12 +2,13 @@ const {web3,ethTx} =  require('./web3')
 
 function buildTransaction(txnCount,addressTo,valueInEther,customData){
     const data = web3.utils.toHex(customData)
+    console.log("TX COUNT: " + txnCount)
 
     // Create the transaction object
     //console.log("outgoing data:",web3.utils.toHex(customData)) 
     return txObject = {
         nonce: web3.utils.toHex(txnCount),
-        gasPrice: web3.utils.toHex(10000),
+        gasPrice: web3.utils.toHex(0),
         gasLimit: web3.utils.toHex(10000000),
         to: addressTo,
         value: web3.utils.toHex(web3.utils.toWei(valueInEther, 'ether')),
@@ -23,6 +24,7 @@ function buildSmartContractTransaction(txnCount,contractData){
     return txObject = {
         nonce: web3.utils.toHex(txnCount),
         gasPrice: web3.utils.toHex(0),
+        //gas: web3.utils.toHex(4700000),
         gasLimit: web3.utils.toHex(10000000),
         data
     }
@@ -33,10 +35,13 @@ const sendTransaction= async(txObject,privKey)=>{
     tx.sign(privKey)
 
     const serializedTx = tx.serialize()
-    const rawTxHex = '0x' + serializedTx.toString('hex')    
+    const rawTxHex = '0x' + serializedTx.toString('hex')
+
+    console.log(rawTxHex)
     
     const receipt = await web3.eth.sendSignedTransaction(rawTxHex)
-    return receipt        
+    console.log("GAS USED:. " + receipt.gasUsed)
+    return receipt  
 }
 
 const getData = async(blockNumber)=>{
@@ -55,6 +60,7 @@ const getTransaction = async txHash => {
 const deploySmartContract = async(contractData,addressFrom,privKey) => {
     try{
         const txCount = await web3.eth.getTransactionCount(addressFrom)
+        console.log(" TXCount: " + txCount)
         const txObject = buildSmartContractTransaction(txCount,contractData)
         const receipt = await sendTransaction(txObject,privKey)
         //Retriveing contract address and transaction hash
